@@ -1,6 +1,20 @@
 import express from 'express';
+import multer from 'multer';
 
 const router = express.Router();
+
+//Multer setup
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/images/'); //Save uploaded files in 'public/images' folder
+    },
+    filename: function (req, file, cb) {
+        const ext = file.originalname.split('.').pop();
+        const newfilename = Date.now() + '_' + Math.round(Math.random() * 1000) + '.' + ext;
+        cb(null, newfilename);
+    }
+})
+const upload = multer({ storage: storage });
 
 router.get('/', (req, res) => {
 });
@@ -13,12 +27,31 @@ router.get('/all', (req, res) => {
 // Get a contact by id
 router.get('/:id', (req, res) => {
     const id = req.params.id;
+
+//To-do: Verify ID is a number
+
+//To-do: Get contact record in database by ID #
+
     res.send('Contact by id ' + id);
 });
 
-// to-do: add post, put, and delete routers
-router.post('/create', (req, res) => {
-    res.send('Create new Contact');
+//To-do: add post, put, and delete routers
+//Create a new contact
+router.post('/create', upload.single('image'), (req, res) => {
+    const { firstName, lastName, phone, email } = req.body;
+    const filename = req.file ? req.file.filename : null;
+
+    const contact = {
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+        email: email,
+        filename: filename
+    }
+
+    //Use prisma to save new contact in database
+
+    res.send(`New Contact: ${firstName} ${lastName} ${filename}`);
 });
 
 router.put('/update/:id', (req, res) => {
