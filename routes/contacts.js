@@ -1,7 +1,13 @@
 import express from 'express';
 import multer from 'multer';
+import { PrismaClient } from '@prisma/client/';
 
 const router = express.Router();
+
+//prisma setup
+const prisma = new PrismaClient({
+    log: ['query', 'info', 'warn', 'error'],
+});
 
 //Multer setup
 const storage = multer.diskStorage({
@@ -17,41 +23,47 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/', (req, res) => {
+    res.send('Contacts route');
 });
 
 // Get all contacts
-router.get('/all', (req, res) => {
-    res.send('All contacts');
+router.get('/all', async (req, res) => {
+    const contacts = await prisma.contact.findMany();
+
+    res.json(contacts);
 });
 
 // Get a contact by id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     const id = req.params.id;
+    
+    const contact = await prisma.contact.findUnique({
+        where: {
+            id: parseInt(id),
+        },
+    });
 
-//To-do: Verify ID is a number
-
-//To-do: Get contact record in database by ID #
-
-    res.send('Contact by id ' + id);
+    res.json(contact);
 });
 
 //To-do: add post, put, and delete routers
-//Create a new contact
-router.post('/create', upload.single('image'), (req, res) => {
-    const { firstName, lastName, phone, email } = req.body;
+//Create a new contact (with Multer)
+router.post('/create', upload.single('image'), async (req, res) => {
     const filename = req.file ? req.file.filename : null;
+    const { firstName, lastName, email, phone, title } = req.body;
 
-    const contact = {
-        firstName: firstName,
-        lastName: lastName,
-        phone: phone,
-        email: email,
-        filename: filename
-    }
+    const contact = await prisma.contact.create({
+        data:{
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone,
+            title: title,
+            filename: filename
+        },
+    });
 
-    //Use prisma to save new contact in database
-
-    res.send(`New Contact: ${firstName} ${lastName} ${filename}`);
+    res.json(contact);
 });
 
 router.put('/update/:id', (req, res) => {
