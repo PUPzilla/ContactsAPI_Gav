@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { PrismaClient } from '@prisma/client/';
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
         const newfilename = Date.now() + '_' + Math.round(Math.random() * 1000) + '.' + ext;
         cb(null, newfilename);
     }
-})
+});
 const upload = multer({ storage: storage });
 
 router.get('/', (req, res) => {
@@ -46,7 +46,6 @@ router.get('/:id', async (req, res) => {
     res.json(contact);
 });
 
-//To-do: add post, put, and delete routers
 //Create a new contact (with Multer)
 router.post('/create', upload.single('image'), async (req, res) => {
     const filename = req.file ? req.file.filename : null;
