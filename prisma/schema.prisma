@@ -18,7 +18,7 @@ model Contact {
   id        Int      @id @default(autoincrement())
   firstName String
   lastName  String
-  title     String?
+  title     String? // ? makes nullable
   email     String
   phone     String?
   filename  String

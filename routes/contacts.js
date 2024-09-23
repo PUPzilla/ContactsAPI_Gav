@@ -23,6 +23,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/', (req, res) => {
+
+
+
     res.send('Contacts route');
 });
 
@@ -51,6 +54,12 @@ router.post('/create', upload.single('image'), async (req, res) => {
     const filename = req.file ? req.file.filename : null;
     const { firstName, lastName, email, phone, title } = req.body;
 
+    //Checking required values are entered
+    if(!firstName || !lastName || !email || !phone){
+        //to-do: delete uploaded file
+        return res.status(400).json({ message: 'Required field is missing.'});
+    };
+
     const contact = await prisma.contact.create({
         data:{
             firstName: firstName,
@@ -65,16 +74,42 @@ router.post('/create', upload.single('image'), async (req, res) => {
     res.json(contact);
 });
 
+//Update contact by ID (with Multer)
+//Updating *where* the ID is, not whole database
 router.put('/update/:id', (req, res) => {
     const id = req.params.id;
+
+    /*To-do:
+            Capture input fields.
+
+            Validate inputs.
+
+            Get contact by ID. Return 404 if not found.
+
+            If image file is uploaded: Get filename to save in DB. Delete the old image file. Set the filename to newfilename.
+            If image file NOT uploaded: When updating record with Prisma, set the filename to oldfilename.
+
+            Update record in DB (Exsuring filename is new or old name)
+    */
+
     res.send('Update Contact by ID' + id);
 });
 
+//Delete contact by ID
 router.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
+
+    /*To-do:
+            Validate the ID number.
+
+            Get contact by ID. Return 404 if not found.
+
+            Delete the image file.
+            
+            Delete the contact in DB.
+    */
+
     res.send('Delete Contact by ID' + id);
 });
-
-
 
 export default router;
