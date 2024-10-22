@@ -21,6 +21,6 @@ model Contact {
   title     String? // ? makes nullable
   email     String
   phone     String?
-  filename  String
+  filename  String?
   createdAt DateTime @default(now())
 }
